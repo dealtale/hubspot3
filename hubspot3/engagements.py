@@ -83,7 +83,7 @@ class EngagementsClient(BaseClient):
 
         return output
 
-    def get_recently_modified(self, since, **options) -> List[Dict]:
+    def get_recently_modified(self, since, max_count, **options) -> List[Dict]:
         """get recently modified engagements"""
         finished = False
         output = []  # type: List[Dict]
@@ -93,11 +93,11 @@ class EngagementsClient(BaseClient):
             batch = self._call(
                 "engagements/recent/modified",
                 method="GET",
-                params={"limit": query_limit, "offset": offset, "since": since},
+                params={"count": query_limit, "offset": offset, "since": since},
                 **options
             )
             output.extend(batch["results"])
-            finished = not batch["hasMore"]
+            finished = not batch["hasMore"] or len(output) >= max_count
             offset = batch["offset"]
 
         return output
